@@ -27,6 +27,7 @@ target_industries = [
 
 
 def find_keywords(content: str) -> bool:
+    content = content.lower()
     if re.findall(r"информационн.{2}([^<{}]*)\sбезопасност", content) or \
             "кибербезопасност" in content or " security" in content \
             or re.findall(r"защит.{1}([^<]*)\sинформаци", content) \
@@ -50,7 +51,8 @@ class CompanySpider(scrapy.Spider):
     def start_requests(self):
         urls = [
             f"https://api.hh.ru/employers/{i}"
-            for i in range(1100852, 10000000)
+            # for i in range(1420832, 10000000)
+            for i in range(428000, 10000000)
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -60,7 +62,7 @@ class CompanySpider(scrapy.Spider):
         company_name = info["name"]
         if "банк" in company_name.lower() or "bank" in company_name.lower():
             return
-        content = info["description"]
+        content = info["description"] or ""
         branded_content = info["branded_description"] or ""
         not_api_url = info["alternate_url"]
         if (find_keywords(content) or find_keywords(branded_content)) and\
